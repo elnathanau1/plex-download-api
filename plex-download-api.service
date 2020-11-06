@@ -1,0 +1,11 @@
+[Unit]
+Description=Flask backend for plex-download-api
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/Documents/Development/plex-download-api/env/bin/python3 /home/pi/Documents/Development/plex-download-api/env/app.py --serve-in-foreground
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
