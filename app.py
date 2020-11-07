@@ -1,6 +1,5 @@
 from flask import Flask, request
 from resources.gogo_stream_service import search as gogo_stream_search
-from resources.gogo_stream_service import test as test_search
 app = Flask(__name__)
 
 DEFAULT_SOURCE = 'GOGO-STREAM'
