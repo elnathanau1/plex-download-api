@@ -28,6 +28,3 @@ def search(query):
     }
 
     return json.dumps(return_map)
-
-def test(query):
-    return "Test: " + query

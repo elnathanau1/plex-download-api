@@ -5,12 +5,10 @@ app = Flask(__name__)
 
 DEFAULT_SOURCE = 'GOGO-STREAM'
 SUPPORTED_SOURCES = [
-    'GOGO-STREAM',
-    'TEST'
+    'GOGO-STREAM'
 ]
 SEARCH_FUNCTION_MAP = {
-    'GOGO-STREAM' : gogo_stream_search,
-    'TEST' : test_search
+    'GOGO-STREAM' : gogo_stream_search
 }
 
 @app.route("/")
