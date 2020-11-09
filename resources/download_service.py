@@ -127,3 +127,11 @@ def add_download_id(id):
         download_ids.pop(0)
     download_ids.append(id)
     redis.save('DOWNLOAD_IDS', json.dumps(download_ids))
+
+
+def create_download_path(root_folder, show_name, season):
+    return root_folder + show_name + '/Season ' + season + '/'
+
+
+def create_file_name(show_name, season, ep_num):
+    return show_name + '_S' + season + 'E' + ep_num + '.mp4'
