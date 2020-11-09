@@ -64,6 +64,19 @@ Example response body:
 }
 ```
 
+### Get All Download UUIDs
+`GET /download/status/all` - Gets the uuids of all download threads
+
+Example response body:
+```
+{
+  "download_ids": [
+    "37f05d92-22b0-11eb-a0e3-34363b742af4",
+    "3cd89572-22b0-11eb-a0e3-34363b742af4",
+    "6e7cd098-22b0-11eb-94ea-34363b742af4"
+  ]
+}
+```
 
 ## Running server:
 Runs on localhost:9050.
