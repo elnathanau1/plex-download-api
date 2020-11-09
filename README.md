@@ -26,6 +26,49 @@ Example response body:
 }
 ```
 
+### Show
+`GET /show` - Gets the episodes from a show page
+
+Query params:
+- `show_url`: String
+
+Example response body:
+```
+{
+  "episodes": [
+    {
+      "url": "https://gogo-stream.com/videos/kimetsu-no-yaiba-episode-26",
+      "ep_num": "26"
+    },
+    {
+      "url": "https://gogo-stream.com/videos/kimetsu-no-yaiba-episode-25",
+      "ep_num": "25"
+    }
+  ]
+}
+```
+
+### Download Episode
+`POST /download/episode` - Downloads episode from episode page
+
+JSON request body:
+```
+{
+	"episode_url" : "https://gogo-stream.com/videos/hajime-no-ippo--episode-20",
+	"show_name" : "Hajime_no_Ippo",
+	"season" : "1",
+	"episode_num" : "20",
+	"root_folder" : "/Users/eau/Documents/Test-landing-path/"
+}
+```
+
+Example response body:
+```
+{
+  "id": "9b982bbc-225c-11eb-9921-34363b742af4"
+}
+```
+
 ### Download from URL
 `POST /download/url` - Download a file from the internet, returning the uuid of the download thread
 

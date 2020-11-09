@@ -1,8 +1,9 @@
 from flask import Flask, request
 from resources.gogo_stream_service import search as gogo_stream_search
+from resources.gogo_stream_service import get_episode_download_link as gogo_stream_get_episode_download_link
 from resources.gogo_stream_service import show as gogo_stream_show
 
-from resources.download_service import start_download, get_download, get_all_download_ids
+from resources.download_service import start_download, get_download, get_all_download_ids, create_download_path, create_file_name
 from resources.utilities import contains_none
 import json
 
@@ -12,11 +13,17 @@ DEFAULT_SOURCE = 'GOGO-STREAM'
 SUPPORTED_SOURCES = [
     'GOGO-STREAM'
 ]
+
 SEARCH_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_search
 }
+
 SHOW_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_show
+}
+
+GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
+    'GOGO-STREAM' : gogo_stream_get_episode_download_link
 }
 
 
@@ -47,6 +54,35 @@ def show():
     api_source = get_api_source()
 
     return SHOW_FUNCTION_MAP[api_source](show_url)
+
+
+@app.route("/download/episode", methods=['POST'])
+def download_episode():
+    episode_url = request.json.get('episode_url')
+    show_name = request.json.get('show_name')
+    season = request.json.get('season')
+    ep_num = request.json.get('episode_num')
+    root_folder = request.json.get('root_folder')
+
+    if contains_none(episode_url, show_name, season, ep_num, root_folder):
+        return "episode_url, show_name, season, ep_num, and root_folder must be included in query params", 400
+
+    # set api_source from header
+    api_source = get_api_source()
+
+    download_link = GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](episode_url)
+    download_location = create_download_path(root_folder, show_name, season)
+    file_name = create_file_name(show_name, season, ep_num)
+
+    print(download_link)
+    print(download_location)
+    print(file_name)
+    id = start_download(download_link, download_location, file_name)
+
+    return json.dumps({
+        'id' : id
+    })
+
 
 
 @app.route("/download/url", methods=['POST'])
