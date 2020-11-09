@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 from bs4 import BeautifulSoup
 import requests
-from clint.textui import progress
 
 import uuid
 from resources import redis_service as redis
