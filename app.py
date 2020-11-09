@@ -74,9 +74,6 @@ def download_episode():
     download_location = create_download_path(root_folder, show_name, season)
     file_name = create_file_name(show_name, season, ep_num)
 
-    print(download_link)
-    print(download_location)
-    print(file_name)
     id = start_download(download_link, download_location, file_name)
 
     return json.dumps({
