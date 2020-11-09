@@ -35,15 +35,12 @@ def download_file(id, download_link, download_location, file_name):
         Path(download_location).mkdir(parents=True, exist_ok=True)
 
         # download file
-        print("request")
         r = requests.get(download_link, stream=True)
-        print("total bytes")
         total_bytes = int(r.headers.get('content-length'))
         downloaded_bytes = 0
 
         with open(path, 'wb') as f:
             # chunk size 0.5 mb
-            print("chunk")
             for chunk in r.iter_content(chunk_size=524288):
                 downloaded_bytes += len(chunk)
                 f.write(chunk)
