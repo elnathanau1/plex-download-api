@@ -134,4 +134,4 @@ def create_download_path(root_folder, show_name, season):
 
 
 def create_file_name(show_name, season, ep_num):
-    return show_name + '_S' + season + 'E' + ep_num + '.mp4'
+    return show_name + '_S' + season + '_E' + ep_num + '.mp4'
