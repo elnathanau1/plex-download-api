@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import re
 
 MAIN_URL = 'https://gogo-stream.com'
 SEARCH_ENDPOINT = 'https://gogo-stream.com/ajax-search.html'
@@ -25,6 +26,29 @@ def search(query):
         'source' : 'gogo-stream',
         'search_endpoint' : SEARCH_ENDPOINT,
         'search_results' : links
+    }
+
+    return json.dumps(return_map)
+
+def generate_episode_json(entry):
+    url = MAIN_URL + entry.find('a')['href']
+    ep_text = entry.find('div', {'class' : 'name'}).text.strip()
+    match_ep_num = re.match(r'.* Episode (.*)', ep_text)
+    ep_num = match_ep_num.group(1)
+    return {
+            'url' : url,
+            'ep_num' : ep_num
+        }
+
+def show(url):
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    episode_list = soup.find('ul', {'class' : 'listing items lists'})
+    episode_entries = episode_list.find_all('li', {'class' : 'video-block'})
+    episodes = list(map(generate_episode_json, episode_entries))
+
+    return_map = {
+        'episodes' : episodes
     }
 
     return json.dumps(return_map)
