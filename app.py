@@ -2,7 +2,8 @@ from flask import Flask, request
 from resources.gogo_stream_service import search as gogo_stream_search
 from resources.gogo_stream_service import show as gogo_stream_show
 
-from resources.utilities import contains_none, start_download, get_download
+from resources.download_service import start_download, get_download, get_all_download_ids
+from resources.utilities import contains_none
 import json
 
 app = Flask(__name__)
@@ -18,9 +19,11 @@ SHOW_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_show
 }
 
+
 @app.route("/")
 def hello():
     return "Hello World!"
+
 
 @app.route("/search")
 def search():
@@ -32,6 +35,7 @@ def search():
     api_source = get_api_source()
 
     return SEARCH_FUNCTION_MAP[api_source](query)
+
 
 @app.route("/show")
 def show():
@@ -60,6 +64,7 @@ def download_url():
         'id' : id
     })
 
+
 @app.route("/download/status")
 def download_status():
     id = request.args.get('id')
@@ -72,6 +77,13 @@ def download_status():
     return status
 
 
+@app.route("/download/status/all")
+def download_status_all():
+    return json.dumps({
+            'download_ids' : get_all_download_ids()
+        })
+
+
 def get_api_source():
     # check for X-API-SOURCE header
     api_source = DEFAULT_SOURCE
@@ -81,6 +93,7 @@ def get_api_source():
             api_source = new_api_source
 
     return api_source
+
 
 if __name__ == '__main__':
     app.run(host="localhost", port=9050, debug=True)
