@@ -8,6 +8,7 @@ import requests
 
 import uuid
 from resources import redis_service as redis
+from resources import utilities
 import concurrent.futures
 import time
 
@@ -40,8 +41,8 @@ def download_file(id, download_link, download_location, file_name):
                 'download_link' : download_link,
                 'path' : path,
                 'status' : 'FILE_ALREADY_EXISTS',
-                'downloaded_bytes' : downloaded_bytes,
-                'total_bytes' : total_bytes,
+                'downloaded_bytes' : 0,
+                'total_bytes' : 0,
                 'start_time' : start_time,
                 'last_update' : current_milli_time()
             }))
@@ -61,8 +62,8 @@ def download_file(id, download_link, download_location, file_name):
                         'download_link' : download_link,
                         'path' : path,
                         'status' : 'DOWNLOADING',
-                        'downloaded_bytes' : downloaded_bytes,
-                        'total_bytes' : total_bytes,
+                        'downloaded_bytes' : utilities.humansize(downloaded_bytes),
+                        'total_bytes' : utilities.humansize(total_bytes),
                         'start_time' : start_time,
                         'last_update' : current_milli_time()
                     }))
@@ -74,8 +75,8 @@ def download_file(id, download_link, download_location, file_name):
                     'download_link' : download_link,
                     'path' : path,
                     'status' : 'DELETED',
-                    'downloaded_bytes' : downloaded_bytes,
-                    'total_bytes' : total_bytes,
+                    'downloaded_bytes' : utilities.humansize(downloaded_bytes),
+                    'total_bytes' : utilities.humansize(total_bytes),
                     'start_time' : start_time,
                     'last_update' : current_milli_time()
                 }))
@@ -85,8 +86,8 @@ def download_file(id, download_link, download_location, file_name):
                     'download_link' : download_link,
                     'path' : path,
                     'status' : 'COMPLETED',
-                    'downloaded_bytes' : downloaded_bytes,
-                    'total_bytes' : total_bytes,
+                    'downloaded_bytes' : utilities.humansize(downloaded_bytes),
+                    'total_bytes' : utilities.humansize(total_bytes),
                     'start_time' : start_time,
                     'last_update' : current_milli_time()
                 }))
