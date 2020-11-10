@@ -34,33 +34,12 @@ def download_file(id, download_link, download_location, file_name):
         # create download_location folder if does not exist
         Path(download_location).mkdir(parents=True, exist_ok=True)
 
-        # download file
-        r = requests.get(download_link, stream=True)
-        total_bytes = int(r.headers.get('content-length'))
-        downloaded_bytes = 0
-
-        with open(path, 'wb') as f:
-            # chunk size 0.5 mb
-            for chunk in r.iter_content(chunk_size=524288):
-                downloaded_bytes += len(chunk)
-                f.write(chunk)
-                redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-                    'download_link' : download_link,
-                    'path' : path,
-                    'status' : 'DOWNLOADING',
-                    'downloaded_bytes' : downloaded_bytes,
-                    'total_bytes' : total_bytes,
-                    'start_time' : start_time,
-                    'last_update' : current_milli_time()
-                }))
-
-        # if file too small (under 2k), delete it
-        if ospath.getsize(path) < 2 * 1024:
-            os.remove(path)
+        # check if file already exists
+        if ospath.exists(download_location + file_name):
             redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
                 'download_link' : download_link,
                 'path' : path,
-                'status' : 'DELETED',
+                'status' : 'FILE_ALREADY_EXISTS',
                 'downloaded_bytes' : downloaded_bytes,
                 'total_bytes' : total_bytes,
                 'start_time' : start_time,
@@ -68,15 +47,49 @@ def download_file(id, download_link, download_location, file_name):
             }))
 
         else:
-            redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-                'download_link' : download_link,
-                'path' : path,
-                'status' : 'COMPLETED',
-                'downloaded_bytes' : downloaded_bytes,
-                'total_bytes' : total_bytes,
-                'start_time' : start_time,
-                'last_update' : current_milli_time()
-            }))
+            # download file
+            r = requests.get(download_link, stream=True)
+            total_bytes = int(r.headers.get('content-length'))
+            downloaded_bytes = 0
+
+            with open(path, 'wb') as f:
+                # chunk size 0.5 mb
+                for chunk in r.iter_content(chunk_size=524288):
+                    downloaded_bytes += len(chunk)
+                    f.write(chunk)
+                    redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
+                        'download_link' : download_link,
+                        'path' : path,
+                        'status' : 'DOWNLOADING',
+                        'downloaded_bytes' : downloaded_bytes,
+                        'total_bytes' : total_bytes,
+                        'start_time' : start_time,
+                        'last_update' : current_milli_time()
+                    }))
+
+            # if file too small (under 2k), delete it
+            if ospath.getsize(path) < 2 * 1024:
+                os.remove(path)
+                redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
+                    'download_link' : download_link,
+                    'path' : path,
+                    'status' : 'DELETED',
+                    'downloaded_bytes' : downloaded_bytes,
+                    'total_bytes' : total_bytes,
+                    'start_time' : start_time,
+                    'last_update' : current_milli_time()
+                }))
+
+            else:
+                redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
+                    'download_link' : download_link,
+                    'path' : path,
+                    'status' : 'COMPLETED',
+                    'downloaded_bytes' : downloaded_bytes,
+                    'total_bytes' : total_bytes,
+                    'start_time' : start_time,
+                    'last_update' : current_milli_time()
+                }))
     except Exception as e:
         redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
             'download_link' : download_link,
