@@ -53,7 +53,7 @@ def show():
     # set api_source from header
     api_source = get_api_source()
 
-    return SHOW_FUNCTION_MAP[api_source](show_url)
+    return json.dumps(SHOW_FUNCTION_MAP[api_source](show_url))
 
 
 @app.route("/download/episode", methods=['POST'])
@@ -78,6 +78,36 @@ def download_episode():
 
     return json.dumps({
         'id' : id
+    })
+
+
+@app.route("/download/season", methods=['POST'])
+def download_season():
+    season_url = request.json.get('season_url')
+    show_name = request.json.get('show_name')
+    season = request.json.get('season')
+    root_folder = request.json.get('root_folder')
+
+    if contains_none(season_url, show_name, season, root_folder):
+        return "season_url, show_name, season, and root_folder must be included in query params", 400
+
+    # set api_source from header
+    api_source = get_api_source()
+
+    download_location = create_download_path(root_folder, show_name, season)
+
+    episodes = SHOW_FUNCTION_MAP[api_source](season_url)['episodes']
+    ids = []
+    for episode in episodes:
+        url = episode['url']
+        ep_num = episode['ep_num']
+        download_link = GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](url)
+        file_name = create_file_name(show_name, season, ep_num)
+        id = start_download(download_link, download_location, file_name)
+        ids.append({'id' : id, 'file_name' : file_name})
+
+    return json.dumps({
+        'downloads' : ids
     })
 
 

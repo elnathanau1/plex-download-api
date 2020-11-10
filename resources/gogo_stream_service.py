@@ -53,7 +53,7 @@ def show(url):
         'episodes' : episodes
     }
 
-    return json.dumps(return_map)
+    return return_map
 
 
 def get_episode_download_link(url):
