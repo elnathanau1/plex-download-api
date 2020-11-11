@@ -13,7 +13,7 @@ import concurrent.futures
 import time
 
 MAX_DOWNLOAD_IDS = 100
-MAX_DOWNLOAD_THREADS = 5
+MAX_DOWNLOAD_THREADS = 30
 executor = concurrent.futures.ThreadPoolExecutor(MAX_DOWNLOAD_THREADS)
 
 current_milli_time = lambda: int(round(time.time() * 1000))
