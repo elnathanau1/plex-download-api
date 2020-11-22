@@ -98,7 +98,7 @@ def download_season():
 
     start_ep = request.json.get('start_ep')
     if start_ep is None:
-        start_ep = 1
+        start_ep = 0
     else:
         start_ep = int(start_ep)
 
