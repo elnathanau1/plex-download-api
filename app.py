@@ -95,6 +95,13 @@ def download_season():
     if contains_none(season_url, show_name, season, root_folder):
         return "season_url, show_name, season, and root_folder must be included in query params", 400
 
+
+    start_ep = request.json.get('start_ep')
+    if start_ep is None:
+        start_ep = 0
+    else:
+        start_ep = int(start_ep)
+
     # set api_source from header
     api_source = get_api_source(SHOW_FUNCTION_MAP)
     if api_source is None:
@@ -107,7 +114,7 @@ def download_season():
     with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
         for episode in episodes:
             url = episode['url']
-            ep_num = episode['ep_num']
+            ep_num = str(int(episode['ep_num']) + start_ep)
 
             future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
             file_name = create_file_name(show_name, season, ep_num)
