@@ -115,7 +115,7 @@ def get_download_ids_in_progress():
 
 
 def create_download_path(root_folder, show_name, season):
-    return root_folder + show_name + '/Season ' + season + '/'
+    return root_folder + show_name + '/Season ' + str(season) + '/'
 
 
 def create_file_name(show_name, season, ep_num):

@@ -83,7 +83,7 @@ def show():
 def download_episode():
     episode_url = request.json.get('episode_url')
     show_name = request.json.get('show_name')
-    season = request.json.get('season')
+    season = str(request.json.get('season'))
     ep_num = request.json.get('episode_num')
     root_folder = request.json.get('root_folder')
 
@@ -111,7 +111,7 @@ def download_episode():
 def download_season():
     season_url = request.json.get('season_url')
     show_name = request.json.get('show_name')
-    season = request.json.get('season')
+    season = str(request.json.get('season'))
     root_folder = request.json.get('root_folder')
 
     if contains_none(season_url, show_name, season, root_folder):
