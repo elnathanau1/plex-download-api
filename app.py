@@ -1,15 +1,20 @@
 from flask import Flask, request
+from flask_cors import CORS, cross_origin
 from resources.gogo_stream_service import search as gogo_stream_search
 from resources.gogo_stream_service import get_episode_download_link as gogo_stream_get_episode_download_link
 from resources.gogo_stream_service import show as gogo_stream_show
+from resources.file_system_service import get_files
+from models import db
 
-from resources.download_service import start_download, get_download, get_all_download_ids, create_download_path, create_file_name
+from resources.download_service import start_download, get_download, get_download_ids, get_download_ids_in_progress, create_download_path, create_file_name
 from resources.utilities import contains_none
 
 import concurrent.futures
 import json
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 SEARCH_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_search
@@ -25,11 +30,13 @@ GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
 
 
 @app.route("/")
+@cross_origin()
 def hello():
     return "Hello World!"
 
 
 @app.route("/search")
+@cross_origin()
 def search():
     # get query
     query = request.args.get('query')
@@ -44,6 +51,7 @@ def search():
 
 
 @app.route("/show")
+@cross_origin()
 def show():
     # get show_url from query params
     show_url = request.args.get('show_url')
@@ -59,6 +67,7 @@ def show():
 
 
 @app.route("/download/episode", methods=['POST'])
+@cross_origin()
 def download_episode():
     episode_url = request.json.get('episode_url')
     show_name = request.json.get('show_name')
@@ -86,6 +95,7 @@ def download_episode():
 
 
 @app.route("/download/season", methods=['POST'])
+@cross_origin()
 def download_season():
     season_url = request.json.get('season_url')
     show_name = request.json.get('show_name')
@@ -98,7 +108,7 @@ def download_season():
 
     start_ep = request.json.get('start_ep')
     if start_ep is None:
-        start_ep = 0
+        start_ep = 1
     else:
         start_ep = int(start_ep)
 
@@ -114,7 +124,7 @@ def download_season():
     with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
         for episode in episodes:
             url = episode['url']
-            ep_num = str(int(episode['ep_num']) + start_ep)
+            ep_num = str(int(episode['ep_num']) + start_ep - 1)
 
             future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
             file_name = create_file_name(show_name, season, ep_num)
@@ -130,7 +140,8 @@ def download_season():
     ids = []
     for file_name, download_link in download_list:
         id = start_download(download_link, download_location, file_name)
-        ids.append({'id' : id, 'file_name' : file_name})
+        if id is not None:
+            ids.append({'id' : id, 'file_name' : file_name})
 
     return json.dumps({
         'downloads' : ids
@@ -139,6 +150,7 @@ def download_season():
 
 
 @app.route("/download/url", methods=['POST'])
+@cross_origin()
 def download_url():
     download_link = request.json.get('download_link')
     download_location = request.json.get('download_location')
@@ -148,6 +160,8 @@ def download_url():
         return "download_link, download_location, and file_name must be included in query params", 400
 
     id = start_download(download_link, download_location, file_name)
+    if id is None:
+        return "File already exists", 400
 
     return json.dumps({
         'id' : id
@@ -155,6 +169,7 @@ def download_url():
 
 
 @app.route("/download/status")
+@cross_origin()
 def download_status():
     id = request.args.get('id')
     if id is None:
@@ -167,10 +182,32 @@ def download_status():
 
 
 @app.route("/download/status/all")
-def download_status_all():
+@cross_origin()
+def download_status_downloading():
+    status = request.args.get('status')
+    if status is None:
+        return "status must be in query parameters", 400
+
     return json.dumps({
-            'download_ids' : get_all_download_ids()
+            'download_ids' : get_download_ids(status)
         })
+
+@app.route("/download/status/in_progress")
+@cross_origin()
+def download_status_in_progress():
+    return json.dumps({
+            'download_ids' : get_download_ids_in_progress()
+        })
+
+@app.route("/file/names", methods=['POST'])
+@cross_origin()
+def file_show_names():
+    root_folder = request.json.get('root_folder')
+
+    if contains_none(root_folder):
+        return "root_folder must be included in query params", 400
+
+    return get_files(root_folder)
 
 
 def get_api_source(function_map):

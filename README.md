@@ -1,6 +1,14 @@
 # plex-download-api
 API written to download media from the web for Plex server
 
+## Alembic set up
+https://blog.theodo.com/2017/03/developping-a-flask-web-app-with-a-postresql-database-making-all-the-possible-errors/
+
+- `python manage.py db init`
+- `python manage.py db migrate`
+- `python manage.py db upgrade`
+
+
 ## API Spec
 ### Search
 `GET /search` - Hits search endpoint of api source.

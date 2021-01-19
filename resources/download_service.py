@@ -5,12 +5,14 @@ import os
 from pathlib import Path
 from bs4 import BeautifulSoup
 import requests
+from datetime import datetime
 
 import uuid
 from resources import redis_service as redis
 from resources import utilities
 import concurrent.futures
 import time
+from models import db, Download, Session
 
 MAX_DOWNLOAD_IDS = 100
 MAX_DOWNLOAD_THREADS = 30
@@ -19,33 +21,21 @@ executor = concurrent.futures.ThreadPoolExecutor(MAX_DOWNLOAD_THREADS)
 current_milli_time = lambda: int(round(time.time() * 1000))
 
 def download_file(id, download_link, download_location, file_name):
-    start_time = current_milli_time()
+    session = Session()
+    start_time = datetime.now()
     path = download_location + file_name
 
-    redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-        'download_link' : download_link,
-        'path' : path,
-        'status' : 'START_THREAD',
-        'downloaded_bytes' : 0,
-        'total_bytes' : 0,
-        'start_time' : start_time,
-        'last_update' : current_milli_time()
-    }))
+    session.query(Download).filter(Download.id == id).update({'status' : 'START_THREAD', 'last_update' : datetime.now()})
+    session.commit()
+
     try:
         # create download_location folder if does not exist
         Path(download_location).mkdir(parents=True, exist_ok=True)
 
         # check if file already exists
         if ospath.exists(download_location + file_name):
-            redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-                'download_link' : download_link,
-                'path' : path,
-                'status' : 'FILE_ALREADY_EXISTS',
-                'downloaded_bytes' : 0,
-                'total_bytes' : 0,
-                'start_time' : start_time,
-                'last_update' : current_milli_time()
-            }))
+            session.query(Download).filter(Download.id == id).update({'status' : 'FILE_ALREADY_EXISTS', 'last_update' : datetime.now()})
+            session.commit()
 
         else:
             # download file
@@ -58,89 +48,70 @@ def download_file(id, download_link, download_location, file_name):
                 for chunk in r.iter_content(chunk_size=524288):
                     downloaded_bytes += len(chunk)
                     f.write(chunk)
-                    redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-                        'download_link' : download_link,
-                        'path' : path,
-                        'status' : 'DOWNLOADING',
-                        'downloaded_bytes' : utilities.humansize(downloaded_bytes),
-                        'total_bytes' : utilities.humansize(total_bytes),
-                        'start_time' : start_time,
-                        'last_update' : current_milli_time()
-                    }))
+                    session.query(Download).filter(Download.id == id).update({'status' : 'DOWNLOADING', 'downloaded_bytes' : utilities.humansize(downloaded_bytes), 'total_bytes' : utilities.humansize(total_bytes), 'last_update' : datetime.now()})
+                    session.commit()
 
             # if file too small (under 2k), delete it
             if ospath.getsize(path) < 2 * 1024:
                 os.remove(path)
-                redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-                    'download_link' : download_link,
-                    'path' : path,
-                    'status' : 'DELETED',
-                    'downloaded_bytes' : utilities.humansize(downloaded_bytes),
-                    'total_bytes' : utilities.humansize(total_bytes),
-                    'start_time' : start_time,
-                    'last_update' : current_milli_time()
-                }))
+                session.query(Download).filter(Download.id == id).update({'status' : 'DELETED', 'downloaded_bytes' : utilities.humansize(downloaded_bytes), 'total_bytes' : utilities.humansize(total_bytes), 'last_update' : datetime.now()})
+                session.commit()
 
             else:
-                redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-                    'download_link' : download_link,
-                    'path' : path,
-                    'status' : 'COMPLETED',
-                    'downloaded_bytes' : utilities.humansize(downloaded_bytes),
-                    'total_bytes' : utilities.humansize(total_bytes),
-                    'start_time' : start_time,
-                    'last_update' : current_milli_time()
-                }))
+                session.query(Download).filter(Download.id == id).update({'status' : 'COMPLETED', 'downloaded_bytes' : utilities.humansize(downloaded_bytes), 'total_bytes' : utilities.humansize(total_bytes), 'last_update' : datetime.now()})
+                session.commit()
     except Exception as e:
-        redis.save('DOWNLOAD_STATUS_' + id, json.dumps({
-            'download_link' : download_link,
-            'path' : path,
-            'status' : 'CRASHED - ' + str(e),
-            'downloaded_bytes' : 0,
-            'total_bytes' : 0,
-            'start_time' : start_time,
-            'last_update' : current_milli_time()
-        }))
+        session.query(Download).filter(Download.id == id).update({'status' : 'CRASHED - ' + str(e), 'downloaded_bytes' : '0 MB', 'total_bytes' : '0 MB', 'last_update' : datetime.now()})
+        session.commit()
+
+    finally:
+        Session.close()
 
 
 def start_download(download_link, download_location, file_name):
-    # generate uuid for identification
-    id = str(uuid.uuid1())
+    # check if file already exists
+    if ospath.exists(download_location + file_name):
+        return None
 
-    # save current status into redis
-    current_status = {
-        'download_link' : download_link,
-        'path' : download_location + file_name,
-        'status' : 'CREATED_THREAD',
-        'downloaded_bytes' : 0,
-        'total_bytes' : 0,
-        'start_time' : 0,
-        'last_update' : current_milli_time()
-    }
-    redis.save('DOWNLOAD_STATUS_' + id, json.dumps(current_status))
+    # generate uuid for identification
+    id = str(uuid.uuid4())
+
+    session = Session()
+    download = Download(id, download_link, download_location + file_name, 'CREATED_THREAD', '0 MB', '0 MB', datetime.now(), datetime.now())
+    session.add(download)
+    session.commit()
+    Session.close()
 
     executor.submit(download_file, id, download_link, download_location, file_name)
-    add_download_id(id)
     return id
 
 
 def get_download(id):
-    return redis.get('DOWNLOAD_STATUS_' + id)
+    download = Download.query.filter(Download.id == id).first()
+    if download is not None:
+        return json.dumps({
+            'id' : str(download.id),
+            'download_link' : download.download_link,
+            'path' : download.path,
+            'status' : download.status,
+            'downloaded_bytes' : download.downloaded_bytes,
+            'total_bytes' : download.total_bytes,
+            'start_time' : download.start_time.strftime("%m/%d/%Y, %H:%M:%S"),
+            'last_update' : download.last_update.strftime("%m/%d/%Y, %H:%M:%S")
+        })
+    return None
 
 
-def get_all_download_ids():
-    download_ids_json = redis.get('DOWNLOAD_IDS')
-    if download_ids_json is None:
-        return []
-    return json.loads(download_ids_json)
+def get_download_ids(status):
+    session = Session()
+    downloads = map(lambda download : str(download.id), session.query(Download).filter(Download.status == status))
+    return list(downloads)
 
 
-def add_download_id(id):
-    download_ids = get_all_download_ids()
-    if len(download_ids) >= MAX_DOWNLOAD_IDS:
-        download_ids.pop(0)
-    download_ids.append(id)
-    redis.save('DOWNLOAD_IDS', json.dumps(download_ids))
+def get_download_ids_in_progress():
+    session = Session()
+    downloads = map(lambda download : str(download.id), session.query(Download).filter(Download.status != 'COMPLETED'))
+    return list(downloads)
 
 
 def create_download_path(root_folder, show_name, season):
