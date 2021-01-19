@@ -16,6 +16,18 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+POSTGRES = {
+    'user': 'postgres',
+    'pw': 'postgres',
+    'db': 'plex_downloads_local',
+    'host': 'localhost',
+    'port': '5432',
+}
+
+db.init_app(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+
 SEARCH_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_search
 }
