@@ -12,9 +12,6 @@ from resources.utilities import contains_none
 import concurrent.futures
 import json
 
-app = Flask(__name__)
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
 POSTGRES = {
     'user': 'postgres',
@@ -24,9 +21,17 @@ POSTGRES = {
     'port': '5432',
 }
 
-db.init_app(app)
+app = Flask(__name__)
+
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+db.init_app(app)
+
 
 SEARCH_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_search
@@ -233,4 +238,4 @@ def get_api_source(function_map):
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=9050, debug=True)
+    app.run(host="localhost", port=9050, debug=False)
