@@ -130,3 +130,5 @@ dmypy.json
 
 # Custom
 migrations/
+sandbox.py
+output.py

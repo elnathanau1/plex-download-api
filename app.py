@@ -3,10 +3,11 @@ from flask_cors import CORS, cross_origin
 from resources.gogo_stream_service import search as gogo_stream_search
 from resources.gogo_stream_service import get_episode_download_link as gogo_stream_get_episode_download_link
 from resources.gogo_stream_service import show as gogo_stream_show
+from resources.showbox_service import get_movie_download_link as showbox_get_movie_download_link
 from resources.file_system_service import get_files
 from models import db
 
-from resources.download_service import start_download, get_download, get_download_ids, get_download_ids_in_progress, create_download_path, create_file_name
+from resources.download_service import start_download, get_download, get_download_ids, get_download_ids_in_progress, create_episode_download_path, create_episode_file_name, create_movie_download_path, create_movie_file_name
 from resources.utilities import contains_none
 
 import concurrent.futures
@@ -43,6 +44,10 @@ SHOW_FUNCTION_MAP = {
 
 GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'GOGO-STREAM' : gogo_stream_get_episode_download_link
+}
+
+GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
+    'SHOWBOX' : showbox_get_movie_download_link
 }
 
 
@@ -83,6 +88,33 @@ def show():
     return json.dumps(SHOW_FUNCTION_MAP[api_source](show_url))
 
 
+@app.route("/download/movie", methods=['POST'])
+@cross_origin()
+def download_movie():
+    movie_url = request.json.get('movie_url')
+    movie_name = request.json.get('movie_name')
+    release_year = str(request.json.get('release_year'))
+    root_folder = request.json.get('root_folder')
+
+    if contains_none(movie_url, movie_name, release_year, root_folder):
+        return "movie_url, movie_name, release_year, and root_folder must be included in query params", 400
+
+    # set api_source from header
+    api_source = get_api_source(GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP)
+    if api_source is None:
+        return "X-API-SOURCE not found/supported", 400
+
+    download_link = GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](movie_url)
+    download_location = create_movie_download_path(root_folder, movie_name, release_year)
+    file_name = create_movie_file_name(movie_name, release_year)
+
+    id = start_download(download_link, download_location, file_name)
+
+    return json.dumps({
+        'id' : id
+    })
+
+
 @app.route("/download/episode", methods=['POST'])
 @cross_origin()
 def download_episode():
@@ -101,8 +133,8 @@ def download_episode():
         return "X-API-SOURCE not found/supported", 400
 
     download_link = GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](episode_url)
-    download_location = create_download_path(root_folder, show_name, season)
-    file_name = create_file_name(show_name, season, ep_num)
+    download_location = create_episode_download_path(root_folder, show_name, season)
+    file_name = create_episode_file_name(show_name, season, ep_num)
 
     id = start_download(download_link, download_location, file_name)
 
@@ -134,7 +166,7 @@ def download_season():
     if api_source is None:
         return "X-API-SOURCE not found/supported", 400
 
-    download_location = create_download_path(root_folder, show_name, season)
+    download_location = create_episode_download_path(root_folder, show_name, season)
 
     episodes = SHOW_FUNCTION_MAP[api_source](season_url)['episodes']
     futures = []
@@ -144,7 +176,7 @@ def download_season():
             ep_num = str(int(episode['ep_num']) + start_ep - 1)
 
             future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
-            file_name = create_file_name(show_name, season, ep_num)
+            file_name = create_episode_file_name(show_name, season, ep_num)
 
             futures.append((file_name, future_download_link))
 
