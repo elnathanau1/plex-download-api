@@ -25,8 +25,12 @@ def get_movie_download_link(url):
     r = requests.post(SHOWBOX_URL, data=form, headers=headers)
     source_json = json.loads(r.text)
     for key in source_json.keys():
-        if source_json[key]['type'] == "storage.googleapis.com":
-            embed_html = source_json[key]['embed']
-            soup = BeautifulSoup(embed_html, 'html.parser')
-            return soup.find("iframe").get('src')
+        embed_html = source_json[key]['embed']
+        soup = BeautifulSoup(embed_html, 'html.parser')
+        src = soup.find("iframe").get('src')
+        try:
+            if int(requests.head(src).headers['content-length']) > 5 * 1024:
+                return src
+        except Exception as e:
+            pass
     return None
