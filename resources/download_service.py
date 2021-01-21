@@ -114,9 +114,17 @@ def get_download_ids_in_progress():
     return list(downloads)
 
 
-def create_download_path(root_folder, show_name, season):
+def create_episode_download_path(root_folder, show_name, season):
     return root_folder + show_name + '/Season ' + str(season) + '/'
 
 
-def create_file_name(show_name, season, ep_num):
+def create_episode_file_name(show_name, season, ep_num):
     return show_name + '_S' + season + '_E' + ep_num + '.mp4'
+
+
+def create_movie_download_path(root_folder, movie_name, release_year):
+    return root_folder + movie_name + '(' + str(release_year) + ')/'
+
+
+def create_movie_file_name(movie_name, release_year):
+    return movie_name + '(' + str(release_year) + ').mp4'
