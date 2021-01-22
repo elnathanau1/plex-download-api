@@ -105,6 +105,10 @@ def download_movie():
         return "X-API-SOURCE not found/supported", 400
 
     download_link = GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](movie_url)
+
+    if download_link is None:
+        return "Download link could not be found", 400
+
     download_location = create_movie_download_path(root_folder, movie_name, release_year)
     file_name = create_movie_file_name(movie_name, release_year)
 
@@ -133,6 +137,9 @@ def download_episode():
         return "X-API-SOURCE not found/supported", 400
 
     download_link = GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](episode_url)
+    if download_link is None:
+        return "Download link could not be found", 400
+
     download_location = create_episode_download_path(root_folder, show_name, season)
     file_name = create_episode_file_name(show_name, season, ep_num)
 
