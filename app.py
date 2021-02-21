@@ -4,6 +4,7 @@ from resources.gogo_stream_service import search as gogo_stream_search
 from resources.gogo_stream_service import get_episode_download_link as gogo_stream_get_episode_download_link
 from resources.gogo_stream_service import show as gogo_stream_show
 from resources.showbox_service import get_movie_download_link as showbox_get_movie_download_link
+from resources.download_anymovies_service import get_movie_download_link as download_anymovies_get_movie_download_link
 from resources.file_system_service import get_files
 from models import db
 
@@ -47,7 +48,8 @@ GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
 }
 
 GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
-    'SHOWBOX' : showbox_get_movie_download_link
+    'SHOWBOX' : showbox_get_movie_download_link,
+    'DOWNLOAD-ANYMOVIES' : download_anymovies_get_movie_download_link
 }
 
 
@@ -104,7 +106,7 @@ def download_movie():
     if api_source is None:
         return "X-API-SOURCE not found/supported", 400
 
-    download_link = GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](movie_url)
+    (download_link, download_headers) = GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP[api_source](movie_url)
 
     if download_link is None:
         return "Download link could not be found", 400
@@ -112,7 +114,7 @@ def download_movie():
     download_location = create_movie_download_path(root_folder, movie_name, release_year)
     file_name = create_movie_file_name(movie_name, release_year)
 
-    id = start_download(download_link, download_location, file_name)
+    id = start_download(download_link, download_location, file_name, download_headers)
 
     return json.dumps({
         'id' : id

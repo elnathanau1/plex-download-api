@@ -20,7 +20,7 @@ executor = concurrent.futures.ThreadPoolExecutor(MAX_DOWNLOAD_THREADS)
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
-def download_file(id, download_link, download_location, file_name):
+def download_file(id, download_link, download_headers, download_location, file_name):
     session = Session()
     start_time = datetime.now()
     path = download_location + file_name
@@ -33,7 +33,7 @@ def download_file(id, download_link, download_location, file_name):
         Path(download_location).mkdir(parents=True, exist_ok=True)
 
         # download file
-        r = requests.get(download_link, stream=True, timeout=60)
+        r = requests.get(download_link, stream=True, timeout=60, headers=download_headers)
         total_bytes = int(r.headers.get('content-length'))
         downloaded_bytes = 0
 
@@ -68,7 +68,7 @@ def download_file(id, download_link, download_location, file_name):
         Session.close()
 
 
-def start_download(download_link, download_location, file_name):
+def start_download(download_link, download_location, file_name, download_headers = {}):
     # check if file already exists
     if ospath.exists(download_location + file_name):
         return None
@@ -82,7 +82,7 @@ def start_download(download_link, download_location, file_name):
     session.commit()
     Session.close()
 
-    executor.submit(download_file, id, download_link, download_location, file_name)
+    executor.submit(download_file, id, download_link, download_headers, download_location, file_name)
     return id
 
 
