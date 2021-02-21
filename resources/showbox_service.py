@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-SHOWBOX_URL = 'https://showbox.works/ajax/n123embed.php'
+SHOWBOX_URL = 'https://showbox.tech/ajax/n123embed.php'
 
 def get_movie_download_link(url):
     r = requests.get(url)
