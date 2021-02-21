@@ -14,5 +14,10 @@ def get_movie_download_link(url):
     source_links = BeautifulSoup(r.content, features="html.parser", parse_only=SoupStrainer('source'))
 
     download_link = source_links.find('source')['src']
-
-    return (download_link, {'referer' : 'https://eplayvid.com/'})
+    headers = {
+        'referer' : 'https://eplayvid.com/',
+        'sec-ch-ua' : '"Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"',
+        'sec-ch-ua-mobile' : '?0',
+        'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'
+    }
+    return (download_link, headers)
