@@ -33,7 +33,7 @@ def download_file(id, download_link, download_headers, download_location, file_n
         Path(download_location).mkdir(parents=True, exist_ok=True)
 
         # download file
-        r = requests.get(download_link, stream=True, timeout=60, headers=download_headers)
+        r = requests.get(download_link, stream=True, timeout=120, headers=download_headers)
         total_bytes = int(r.headers.get('content-length'))
         downloaded_bytes = 0
 
