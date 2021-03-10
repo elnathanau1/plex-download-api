@@ -3,6 +3,8 @@ from flask_cors import CORS, cross_origin
 from resources.gogo_stream_service import search as gogo_stream_search
 from resources.gogo_stream_service import get_episode_download_link as gogo_stream_get_episode_download_link
 from resources.gogo_stream_service import show as gogo_stream_show
+from resources.bmovies_service import get_episode_download_link as bmovies_get_episode_download_link
+from resources.bmovies_service import show as bmovies_show
 from resources.showbox_service import get_movie_download_link as showbox_get_movie_download_link
 from resources.download_anymovies_service import get_movie_download_link as download_anymovies_get_movie_download_link
 from resources.file_system_service import get_files
@@ -40,11 +42,13 @@ SEARCH_FUNCTION_MAP = {
 }
 
 SHOW_FUNCTION_MAP = {
-    'GOGO-STREAM' : gogo_stream_show
+    'GOGO-STREAM' : gogo_stream_show,
+    'BMOVIES' : bmovies_show
 }
 
 GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
-    'GOGO-STREAM' : gogo_stream_get_episode_download_link
+    'GOGO-STREAM' : gogo_stream_get_episode_download_link,
+    'BMOVIES' : bmovies_get_episode_download_link,
 }
 
 GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
