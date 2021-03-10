@@ -68,7 +68,7 @@ def get_episode_download_link(url):
             reversed_unpacked = unpacked[::-1] # for regex purposes, to search backwards (the mp4 is most important)
             link = re.findall(r'(4pm\..+?)":elif', reversed_unpacked)[0][::-1]
             r = requests.head(link)
-            if r.headers['Content-Length'] > 2 * 1024:
+            if int(r.headers['Content-Length']) > 2 * 1024:
                 return link
             else:
                 return None
