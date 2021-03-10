@@ -66,7 +66,12 @@ def get_episode_download_link(url):
             text = text.strip()
             unpacked = eval('utilities.unpack' + text[text.find('}(') + 1:-1])
             reversed_unpacked = unpacked[::-1] # for regex purposes, to search backwards (the mp4 is most important)
-            return re.findall(r'(4pm\..+?)":elif', reversed_unpacked)[0][::-1]
+            link = re.findall(r'(4pm\..+?)":elif', reversed_unpacked)[0][::-1]
+            r = requests.head(link)
+            if r.headers['Content-Length'] > 2 * 1024:
+                return link
+            else:
+                return None
 
 def _tsd_tsd_ds(s):
     _51x13o = s
