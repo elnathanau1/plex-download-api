@@ -4,6 +4,9 @@ import json
 import re
 from resources import utilities
 
+def get_movie_download_link(url):
+    return (get_episode_download_link(url), {})
+
 def generate_episode_json(link):
     url = link['href']
     ep_num = re.search(r'×(.+?)\Z', link.text.strip())[1]

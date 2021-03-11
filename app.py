@@ -5,6 +5,7 @@ from resources.gogo_stream_service import get_episode_download_link as gogo_stre
 from resources.gogo_stream_service import show as gogo_stream_show
 from resources.bmovies_service import get_episode_download_link as bmovies_get_episode_download_link
 from resources.bmovies_service import show as bmovies_show
+from resources.bmovies_service import get_movie_download_link as bmovies_get_movie_download_link
 from resources.showbox_service import get_movie_download_link as showbox_get_movie_download_link
 from resources.download_anymovies_service import get_movie_download_link as download_anymovies_get_movie_download_link
 from resources.file_system_service import get_files
@@ -53,7 +54,8 @@ GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
 
 GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'SHOWBOX' : showbox_get_movie_download_link,
-    'DOWNLOAD-ANYMOVIES' : download_anymovies_get_movie_download_link
+    'DOWNLOAD-ANYMOVIES' : download_anymovies_get_movie_download_link,
+    'BMOVIES' : bmovies_get_movie_download_link
 }
 
 
