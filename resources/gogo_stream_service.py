@@ -6,6 +6,10 @@ import re
 MAIN_URL = 'https://gogo-stream.com'
 SEARCH_ENDPOINT = 'https://gogo-stream.com/ajax-search.html'
 
+def get_movie_download_link(url):
+    return (get_episode_download_link(url), {})
+
+
 def search(query):
     # create search call
     queries = {'keyword' : query, 'id' : '-1'}

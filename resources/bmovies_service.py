@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import json
 import re
 from resources import utilities
+import time
+import random
 
 def get_movie_download_link(url):
     return (get_episode_download_link(url), {})
@@ -30,6 +32,7 @@ def show(url):
     return return_map
 
 def get_episode_download_link(url):
+    time.sleep(random.uniform(1.0, 10.0))
     r = requests.get(url)
     show_page_soup = BeautifulSoup(r.content, 'html.parser')
     token_link = show_page_soup.find('a', {'class' : 'thumb mvi-cover'})['href']
