@@ -190,7 +190,7 @@ def download_season():
     with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
         for episode in episodes:
             url = episode['url']
-            ep_num = str(int(episode['ep_num']) + start_ep - 1)
+            ep_num = str(float(episode['ep_num']) + start_ep - 1)
 
             future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
             file_name = create_episode_file_name(show_name, season, ep_num)
