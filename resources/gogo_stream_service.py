@@ -74,11 +74,11 @@ def get_episode_download_link(url):
 
 
 def choose_download_link(download_links):
-    google_download_links = [link for link, description in download_links if 'storage.googleapis' in link]
+    google_download_links = [(link, description) for link, description in download_links if 'storage.googleapis' in link]
     if len(google_download_links) != 0:
         quality_order = ['720P', '480P', '1080P', 'HDP', '360P']
         for quality in quality_order:
-            found = [link for link, description in download_links if quality in description]
+            found = [link for link, description in google_download_links if quality in description]
             if len(found) != 0:
                 return found[0]
     return None
