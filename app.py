@@ -172,6 +172,7 @@ def download_season():
     season = str(request.json.get('season'))
     root_folder = request.json.get('root_folder')
     filler_url = request.json.get('filler_url')
+    ep_range = request.json.get('ep_range')
 
     if contains_none(season_url, show_name, season, root_folder):
         return "season_url, show_name, season, and root_folder must be included in query params", 400
@@ -201,10 +202,11 @@ def download_season():
             ep_num = "{:.5g}".format(float(episode['ep_num']) + start_ep - 1)
 
             if ep_num not in filler_eps:
-                future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
-                file_name = create_episode_file_name(show_name, season, ep_num)
+                if ep_range is None or (ep_range[0] <= ep_num <= ep_range[1]):
+                    future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
+                    file_name = create_episode_file_name(show_name, season, ep_num)
 
-                futures.append((file_name, future_download_link))
+                    futures.append((file_name, future_download_link))
 
     download_list = []
     for file_name, future_download_link in futures:
