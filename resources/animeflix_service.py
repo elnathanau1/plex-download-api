@@ -31,13 +31,16 @@ def show(url):
 
 
 def get_episode_download_link(url):
-    r = requests.get(url)
-    soup = BeautifulSoup(r.content, features='html.parser')
-    embed_link = soup.find('iframe').get('src')
+    try:
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content, features='html.parser')
+        embed_link = soup.find('iframe').get('src')
 
-    r = requests.get(embed_link)
-    soup = BeautifulSoup(r.content, features='html.parser')
-    download_link = soup.find('video').find('source').get('src')
+        r = requests.get(embed_link)
+        soup = BeautifulSoup(r.content, features='html.parser')
+        download_link = soup.find('video').find('source').get('src')
 
-    return download_link
+        return download_link
+    except:
+        return None
 
