@@ -62,7 +62,7 @@ GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'SHOWBOX' : showbox_get_movie_download_link,
     'DOWNLOAD-ANYMOVIES' : download_anymovies_get_movie_download_link,
     'BMOVIES' : bmovies_get_movie_download_link,
-    'GOGO-STREAM' : gogo_stream_get_movie_download_link
+    'GOGO-STREAM' : gogo_stream_get_movie_download_link,
     'ANIMEFLIX' : animeflix_get_movie_download_link
 }
 
