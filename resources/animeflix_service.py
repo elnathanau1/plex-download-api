@@ -1,11 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+from sbplay_scraper import scrape_download_link as sbplay_scrape
 
 MAIN_URL = 'https://animeflix.ws'
 
+
 def get_movie_download_link(url):
     return (get_episode_download_link(url), {})
+
 
 def generate_episode_json(entry):
     url = entry.find('a').get('href')
@@ -38,9 +41,13 @@ def get_episode_download_link(url):
 
         r = requests.get(embed_link)
         soup = BeautifulSoup(r.content, features='html.parser')
-        download_link = soup.find('video').find('source').get('src')
+        link_servers = soup.find_all('li', {'class': 'linkserver'})
+        try:
+            sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video'].replace(
+                'embed-', '')
+            return sbplay_scrape(sbplay_link)
+        except StopIteration:
+            return None
 
-        return download_link
     except:
         return None
-
