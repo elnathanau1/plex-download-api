@@ -11,7 +11,7 @@ def get_movie_download_link(url):
 
 
 def generate_episode_json(entry):
-    url = MAIN_URL + entry.find('a').get('href')
+    url = entry.find('a').get('href')
     ep_num = re.match(r'.+Episode (.+?)(?:\Z| )+', entry.find('a')['title']).group(1)
     return {
         'url': MAIN_URL + url,
