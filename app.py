@@ -202,7 +202,7 @@ def download_season():
             ep_num = "{:.5g}".format(float(episode['ep_num']) + start_ep - 1)
 
             if ep_num not in filler_eps:
-                if ep_range is None or (ep_range[0] <= ep_num <= ep_range[1]):
+                if ep_range is None or (ep_range[0] <= float(ep_num) <= ep_range[1]):
                     future_download_link = executor.submit(GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP[api_source], url)
                     file_name = create_episode_file_name(show_name, season, ep_num)
 
