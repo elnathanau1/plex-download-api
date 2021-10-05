@@ -4,6 +4,9 @@ from resources.gogo_stream_service import search as gogo_stream_search
 from resources.gogo_stream_service import get_episode_download_link as gogo_stream_get_episode_download_link
 from resources.gogo_stream_service import show as gogo_stream_show
 from resources.gogo_stream_service import get_movie_download_link as gogo_stream_get_movie_download_link
+from resources.gowatchseries_service import get_episode_download_link as gowatchseries_get_episode_download_link
+from resources.gowatchseries_service import show as gowatchseries_show
+from resources.gowatchseries_service import get_movie_download_link as gowatchseries_get_movie_download_link
 from resources.animeflix_service import get_episode_download_link as animeflix_get_episode_download_link
 from resources.animeflix_service import show as animeflix_show
 from resources.animeflix_service import get_movie_download_link as animeflix_get_movie_download_link
@@ -48,13 +51,15 @@ SEARCH_FUNCTION_MAP = {
 SHOW_FUNCTION_MAP = {
     'GOGO-STREAM': gogo_stream_show,
     'ANIMEFLIX': animeflix_show,
-    'BMOVIES': bmovies_show
+    'BMOVIES': bmovies_show,
+    'GOWATCHSERIES': gowatchseries_show
 }
 
 GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'GOGO-STREAM': gogo_stream_get_episode_download_link,
     'ANIMEFLIX': animeflix_get_episode_download_link,
     'BMOVIES': bmovies_get_episode_download_link,
+    'GOWATCHSERIES': gowatchseries_get_episode_download_link
 }
 
 GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
@@ -62,7 +67,8 @@ GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'DOWNLOAD-ANYMOVIES': download_anymovies_get_movie_download_link,
     'BMOVIES': bmovies_get_movie_download_link,
     'GOGO-STREAM': gogo_stream_get_movie_download_link,
-    'ANIMEFLIX': animeflix_get_movie_download_link
+    'ANIMEFLIX': animeflix_get_movie_download_link,
+    'GOWATCHSERIES': gowatchseries_get_movie_download_link
 }
 
 
