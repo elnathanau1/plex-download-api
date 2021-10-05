@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from sbplay_scraper import scrape_download_link as sbplay_scrape
+from resources.sbplay_scraper import scrape_download_link as sbplay_scrape
 
 MAIN_URL = 'https://animeflix.ws'
 
