@@ -16,5 +16,15 @@ def scrape_download_link(sbplay_embed_link):
     r = requests.get(download_page_link)
     soup = BeautifulSoup(r.content, features='html.parser')
     span = soup.find('span', {'style': 'background:#f9f9f9;border:1px dotted #bbb;padding:7px;'})
+    # occasionally there is security issue, but is just a button press to bypass.
+    if span is None:
+        hash = soup.find('input', {'name': 'hash'})['value']
+        download_page_link = 'https://sbplay.one/dl?op=download_orig&id={}&mode=h&hash={}'.format(id, hash)
+        print(download_page_link)
+
+        r = requests.get(download_page_link)
+        soup = BeautifulSoup(r.content, features='html.parser')
+        span = soup.find('span', {'style': 'background:#f9f9f9;border:1px dotted #bbb;padding:7px;'})
+
     download_link = span.find('a')['href']
     return download_link

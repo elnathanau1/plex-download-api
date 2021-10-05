@@ -47,7 +47,9 @@ def get_episode_download_link(url):
                 'embed-', '')
             return sbplay_scrape(sbplay_link)
         except StopIteration:
+            print("sbplay not found for {}".format(url))
             return None
 
-    except:
+    except Exception as e:
+        print("Error getting download link for {}".format(url))
         return None
