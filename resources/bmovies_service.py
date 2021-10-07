@@ -26,7 +26,7 @@ def show(url):
     episodes = list(map(generate_episode_json, links))
 
     return_map = {
-        'episodes' : episodes
+        'episodes': list(filter(lambda ep: ep['ep_num'].isnumeric(), episodes))
     }
 
     return return_map
