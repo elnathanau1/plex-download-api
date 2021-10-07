@@ -27,8 +27,11 @@ def scrape_download_link(sbplay_embed_link):
 
         # occasionally there is security issue, but is just a button press to bypass.
         if span is None:
-            hash = soup.find('input', {'name': 'hash'})['value']
-            download_page_link = 'https://sbplay.one/dl?op=download_orig&id={}&mode=h&hash={}'.format(id, mode, hash)
+            if soup.find('input', {'name': 'hash'}) is not None:
+                new_hash = soup.find('input', {'name': 'hash'})['value']
+                download_page_link = 'https://sbplay.one/dl?op=download_orig&id={}&mode=h&hash={}'.format(attempt[0],
+                                                                                                          attempt[1],
+                                                                                                          new_hash)
 
             r = requests.get(download_page_link)
             soup = BeautifulSoup(r.content, features='html.parser')
@@ -36,5 +39,5 @@ def scrape_download_link(sbplay_embed_link):
 
         if span is not None:
             return span.find('a')['href']
-        
+
     return None
