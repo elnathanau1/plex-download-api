@@ -305,4 +305,4 @@ def get_api_source(function_map):
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=9050, debug=False)
+    app.run(host="0.0.0.0", port=9050, debug=False)
