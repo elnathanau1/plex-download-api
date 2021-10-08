@@ -41,6 +41,14 @@ def get_episode_download_link(url):
 
         r = requests.get(embed_link)
         soup = BeautifulSoup(r.content, features='html.parser')
+        # first search to see if animeflix is using basic video tag
+        video_tag = soup.find("video")
+        if video_tag is not None:
+            source = video_tag.find("source")
+            if source is not None:
+                return source["src"]
+
+        # search for a server in the list of servers
         link_servers = soup.find_all('li', {'class': 'linkserver'})
         try:
             sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video'].replace(
@@ -53,3 +61,4 @@ def get_episode_download_link(url):
     except Exception as e:
         print("Error getting download link for {}".format(url))
         return None
+
