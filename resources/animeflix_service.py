@@ -37,9 +37,11 @@ def get_episode_download_link(url):
     try:
         r = requests.get(url)
         soup = BeautifulSoup(r.content, features='html.parser')
-        embed_link = soup.find('iframe').get('src')
+        select = soup.find("select", {"id": "select-iframe-to-display"})
+        options = select.find_all('option')
+        vidCDN_link = next(option for option in options if "VidCDN" in option.text)['value']
 
-        r = requests.get(embed_link)
+        r = requests.get(vidCDN_link)
         soup = BeautifulSoup(r.content, features='html.parser')
         # first search to see if animeflix is using basic video tag
         video_tag = soup.find("video")
@@ -61,4 +63,3 @@ def get_episode_download_link(url):
     except Exception as e:
         print("Error getting download link for {}".format(url))
         return None
-
