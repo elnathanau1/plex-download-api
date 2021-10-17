@@ -54,7 +54,7 @@ def get_episode_download_link(url):
         link_servers = soup.find_all('li', {'class': 'linkserver'})
         try:
             sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video'].replace(
-                'embed-', '')
+                '/e/', '/d/')
             return sbplay_scrape(sbplay_link)
         except StopIteration:
             print("sbplay not found for {}".format(url))
@@ -63,3 +63,6 @@ def get_episode_download_link(url):
     except Exception as e:
         print("Error getting download link for {}".format(url))
         return None
+
+
+print(get_episode_download_link("https://animeflix.ws/videos/86-2nd-season-episode-3"))
