@@ -42,8 +42,7 @@ def get_episode_download_link(url):
         soup = BeautifulSoup(r.content, features='html.parser')
         link_servers = soup.find_all('li', {'class': 'linkserver'})
         try:
-            sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video'].replace(
-                'embed-', '')
+            sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video']
             return sbplay_scrape(sbplay_link)
         except StopIteration:
             print("sbplay not found for {}".format(url))
@@ -53,3 +52,4 @@ def get_episode_download_link(url):
         print(url)
         return None
 
+print(get_movie_download_link('https://gowatchseries.online/jumanji-the-next-level-episode-0'))

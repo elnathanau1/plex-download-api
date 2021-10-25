@@ -53,8 +53,7 @@ def get_episode_download_link(url):
         # search for a server in the list of servers
         link_servers = soup.find_all('li', {'class': 'linkserver'})
         try:
-            sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video'].replace(
-                '/e/', '/d/')
+            sbplay_link = next(link for link in link_servers if 'sbplay' in link['data-video'])['data-video']
             return sbplay_scrape(sbplay_link)
         except StopIteration:
             print("sbplay not found for {}".format(url))

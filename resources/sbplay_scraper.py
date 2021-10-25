@@ -5,6 +5,7 @@ import re
 
 # TODO: REFACTOR THIS
 def scrape_download_link(sbplay_embed_link):
+    sbplay_embed_link = sbplay_embed_link.replace('embed-', '').replace('/e/', '/d/')
     r = requests.get(sbplay_embed_link)
     soup = BeautifulSoup(r.content, features='html.parser')
     download_link_button = soup.find('a', {'href': '#'})
