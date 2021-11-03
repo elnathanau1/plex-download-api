@@ -10,6 +10,9 @@ from resources.gowatchseries_service import get_movie_download_link as gowatchse
 from resources.animeflix_service import get_episode_download_link as animeflix_get_episode_download_link
 from resources.animeflix_service import show as animeflix_show
 from resources.animeflix_service import get_movie_download_link as animeflix_get_movie_download_link
+from resources.animekisa_service import get_episode_download_link as animekisa_get_episode_download_link
+from resources.animekisa_service import show as animekisa_show
+from resources.animekisa_service import get_movie_download_link as animekisa_get_movie_download_link
 from resources.bmovies_service import get_episode_download_link as bmovies_get_episode_download_link
 from resources.bmovies_service import show as bmovies_show
 from resources.bmovies_service import get_movie_download_link as bmovies_get_movie_download_link
@@ -51,6 +54,7 @@ SEARCH_FUNCTION_MAP = {
 SHOW_FUNCTION_MAP = {
     'GOGO-STREAM': gogo_stream_show,
     'ANIMEFLIX': animeflix_show,
+    'ANIMEKISA': animekisa_show,
     'BMOVIES': bmovies_show,
     'GOWATCHSERIES': gowatchseries_show
 }
@@ -58,6 +62,7 @@ SHOW_FUNCTION_MAP = {
 GET_EPISODE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'GOGO-STREAM': gogo_stream_get_episode_download_link,
     'ANIMEFLIX': animeflix_get_episode_download_link,
+    'ANIMEKISA': animekisa_get_episode_download_link,
     'BMOVIES': bmovies_get_episode_download_link,
     'GOWATCHSERIES': gowatchseries_get_episode_download_link
 }
@@ -68,6 +73,7 @@ GET_MOVIE_DOWNLOAD_LINK_FUNCTION_MAP = {
     'BMOVIES': bmovies_get_movie_download_link,
     'GOGO-STREAM': gogo_stream_get_movie_download_link,
     'ANIMEFLIX': animeflix_get_movie_download_link,
+    'ANIMEKISA': animekisa_get_movie_download_link,
     'GOWATCHSERIES': gowatchseries_get_movie_download_link
 }
 
