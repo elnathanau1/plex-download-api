@@ -12,7 +12,7 @@ def get_movie_download_link(url):
 
 
 def generate_episode_json(link):
-    url = MAIN_URL + link.get('href')
+    url = link.get('href')
     ep_num = link.find('div', {'class': 'infoept2'}).text.strip()
     return {
         'url': MAIN_URL + url,
