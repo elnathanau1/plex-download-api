@@ -56,5 +56,3 @@ def get_episode_download_link(url):
         print("Error getting download link for {}".format(url))
         return None
 
-
-print(show("https://animekisa.tv/that-time-i-got-reincarnated-as-a-slime"))
