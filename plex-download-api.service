@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 Type=simple
 ExecStart=/home/pi/Documents/Development/plex-download-api/env/bin/python3 /home/pi/Documents/Development/plex-download-api/app.py --serve-in-foreground
-Restart=on-abort
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
